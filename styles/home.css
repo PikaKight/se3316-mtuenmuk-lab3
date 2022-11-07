@@ -12,3 +12,12 @@ body{
     padding: 2%;
     border: 2px solid black;
 }
+
+.resultList{
+    width: 100%;
+}
+
+.resultList, th, td{
+    border: 1px solid;
+}
+
