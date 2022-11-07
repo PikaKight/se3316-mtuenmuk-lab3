@@ -1,0 +1,14 @@
+body{
+    background: linear-gradient(230deg, rgba(220, 20, 60, 0.603), rgba(128, 183, 231, 0.816));
+}
+
+.searchBar{
+    display: flex;
+    border: 2px solid black;
+}
+
+.results{
+    margin: auto;
+    padding: 2%;
+    border: 2px solid black;
+}
