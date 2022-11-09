@@ -6,3 +6,4 @@
 3. express
 4. nodemon
 5. mongodb
+6. mongoose
