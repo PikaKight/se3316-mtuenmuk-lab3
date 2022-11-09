@@ -5,3 +5,5 @@ const uri = `mongodb+srv://mtuenmuk:${process.env.password}@se3316.cfpaiqb.mongo
 mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true})
     .then((result) => console.log('connected to db'))
     .catch((err) => console.log(err))
+
+    

@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const genre = new Schema({
+const genreSchema = new Schema({
     genreID: {
         type: Number,
         required: true
@@ -15,3 +15,7 @@ const genre = new Schema({
         required: true
     }
 });
+
+const Genre = mongoose.model('Genre', genreSchema);
+
+module.exports = Genre; 
