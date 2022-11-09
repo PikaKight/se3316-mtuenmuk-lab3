@@ -6,14 +6,15 @@ const genreSchema = new Schema({
         type: Number,
         required: true
     },
-    genreName: {
-        type: String,
-        required: true
-    },
     parentID: {
         type: Number,
         required: true
+    },
+    title: {
+        type: String,
+        required: true
     }
+    
 });
 
 const Genre = mongoose.model('Genre', genreSchema);
