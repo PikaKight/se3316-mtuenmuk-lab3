@@ -201,7 +201,7 @@ app.post('/playlist', async (req, res) => {
     
     const playlist = {
         name: req.body.name,
-        trackID: []
+        tracks: []
     };
 
     const pL = new Playlist(playlist);
@@ -213,7 +213,7 @@ app.post('/playlist', async (req, res) => {
 app.post('/playlist/tracks', async (req, res) =>{
     const schema = Joi.object({
         name: Joi.string().required(),
-        trackID: Joi.array().required()
+        tracks: Joi.array().required()
     });
 
     const validation = schema.validate(req.body);
@@ -230,7 +230,7 @@ app.post('/playlist/tracks', async (req, res) =>{
         return;
     };
 
-    const data = await findOne(Playlist, "name", req.body.name, "trackID", req.body.tracks)
+    const data = await findOne(Playlist, "name", req.body.name, "tracks", req.body.tracks)
     res.send(data)
     console.log("done")
 })
@@ -257,6 +257,18 @@ app.post('/playlist/delete', async (req, res) =>{
     deleteOne(Playlist, "name", req.body.name)
     console.log("deleted")
 })
+
+app.get('/playlist/count', async (req, res) => {
+    const count = [];
+    
+    const data = await findAll(Playlist)
+    data.forEach( (item) => {
+        item.trackNum = item.tracks.length
+        
+        count.push(item)
+    })
+    res.send(data)
+});
 
 const port = process.env.PORT || 5501;
 app.listen(port, () => console.log(`listing to port ${port}`));

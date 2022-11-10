@@ -16,6 +16,10 @@ function delData(collection){
     console.log("removed")
 };
 
+function getAll(collection){
+    return collection.find({})
+}
+
 function findAll(collection, param, value){
     return collection.find({
         [param]: value

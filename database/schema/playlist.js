@@ -6,8 +6,12 @@ const playlistSchema = new Schema({
         type: String,
         required: true
     },
-    trackID: {
+    tracks: {
         type: Array,
+        required: false
+    },
+    playTime: {
+        type: Number,
         required: false
     }
 });
