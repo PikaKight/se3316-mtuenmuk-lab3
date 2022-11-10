@@ -16,4 +16,20 @@ function delData(collection){
     console.log("removed")
 };
 
-module.exports = saveData;
+function findAll(collection, param, value){
+    return collection.find({
+        [param]: value
+    })
+}
+
+function deleteAll(collection){
+    collection.deleteMany({})
+}
+
+function checkExist(collection, check){
+    collection.exist({
+
+    })
+}
+
+module.exports = {saveData, delData, findAll, deleteAll};

@@ -7,20 +7,16 @@ body{
     border: 2px solid black;
 }
 
-.results{
+.results, .myList{
     margin: auto;
     padding: 2%;
-    border: 2px solid black;
 }
 
-.resultList{
+.resultList, .fav{
     width: 100%;
-}
-
-.resultList, th, td{
     border: 1px solid;
 }
 
-.fav{
-    width: 100%;
+th, td{
+    border: 1px solid;
 }

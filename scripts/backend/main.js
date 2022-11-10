@@ -3,7 +3,7 @@ const {parse} = require('csv-parse');
 const fs = require('fs');
 
 
-const saveData = require('./database.js');
+const {saveData, findAll} = require('./database.js');
 const Genre = require('../../database/schema/genre.js');
 const Artist = require("../../database/schema/artist.js");
 const Track = require("../../database/schema/track.js");
@@ -17,7 +17,7 @@ app.use(express.json());
 
 app.get('/', (req, res) =>{
     console.log('here');
-    res.send('hi');
+    res.send('Hi');
 });
 
 
@@ -162,6 +162,22 @@ app.get('/track', (req, res) =>{
                     console.log("done")
                     res.send("done")
             });
+});
+
+app.get('/artist/:name', async (req, res) => {
+    const data = await findAll(Artist, "name", req.params.name)
+    console.log("done")
+    res.send(data)
+});
+
+app.get('/track/:id', async (req, res) => {
+    const data = await findAll(Track, "trackID", req.params.id)
+    console.log("done")
+    res.send(data)
+});
+
+app.post('/playlist', (req, res) => {
+    
 });
 
 const port = process.env.PORT || 5501;
