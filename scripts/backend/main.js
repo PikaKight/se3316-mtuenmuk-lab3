@@ -3,9 +3,17 @@ const {parse} = require('csv-parse');
 const fs = require('fs');
 
 
+const saveData = require('./database.js');
+const Genre = require('../../database/schema/genre.js');
+const Artist = require("../../database/schema/artist.js");
+const Track = require("../../database/schema/track.js");
+
+
 require("dotenv").config();
 
 const app = express();
+
+app.use(express.json());
 
 app.get('/', (req, res) =>{
     console.log('here');
@@ -23,7 +31,7 @@ app.get('/genres', (req, res) =>{
                     delimiter: ",",
                     columns: true,
                     group_columns_by_name: true,
-                    to: 500
+                    
                 })
             )
             .on('data', (data)=>{
@@ -32,9 +40,24 @@ app.get('/genres', (req, res) =>{
             .on("end", () => {
                 console.log("parsed")
 
-                const genres = genre.map(({genre_id: genreID, parent: parentID, title}) => ({genreID, parentID, title}));
-                                
-                res.send(genres)
+                const genres = genre.map(({
+                    genre_id: genreID,
+                    parent: parentID, 
+                    title
+                }) => ({
+                        genreID,
+                        parentID,
+                        title
+                    }));
+                
+                 
+
+                genres.forEach((item) => {         
+                    saveData(new Genre(item));
+                })
+                
+                console.log("done")
+                res.send("done")
             });
 });
 
@@ -52,7 +75,7 @@ app.get('/artist', (req, res) =>{
                 })
             )
             .on('data', (data)=>{
-                genre.push(data);
+                artist.push(data);
             })
             .on("end", () => {
                 console.log("parsed")
@@ -65,9 +88,22 @@ app.get('/artist', (req, res) =>{
                         artist_comments: numComments,
                         artist_favorites: numFav,
                         tags
-                    }) => ({artistID, creationDate, handle, name, numComments, numFav, tags}));
-                                
-                res.send(artists)
+                    }) => ({
+                        artistID, 
+                        creationDate, 
+                        handle, 
+                        name, 
+                        numComments, 
+                        numFav, 
+                        tags
+                    }));
+                                                
+                    artists.forEach((item) => {       
+                        saveData(new Artist(item));
+                    })
+                    
+                    console.log("done")
+                    res.send("done")
             });
 });
 
@@ -81,7 +117,8 @@ app.get('/track', (req, res) =>{
                 parse({
                     delimiter: ",",
                     columns: true,
-                    group_columns_by_name: true
+                    group_columns_by_name: true,
+                    to: 500
                 })
             )
             .on('data', (data)=>{
@@ -94,9 +131,9 @@ app.get('/track', (req, res) =>{
                         track_id: trackID, 
                         album_id: albumID, 
                         album_title: albumTitle,
-                        artist_id: artisID, 
+                        artist_id: artistID, 
                         artist_name: name,
-                        tags: numComments,
+                        tags,
                         track_date_created: creationDate,
                         track_date_recorded: recordDate,
                         track_duration: duration,
@@ -106,9 +143,10 @@ app.get('/track', (req, res) =>{
                     }) => ({
                         trackID,
                         albumID,
-                        albumTitle, artisID,
+                        albumTitle,
+                        artistID,
                         name,
-                        numComments,
+                        tags,
                         creationDate,
                         recordDate,
                         duration,
@@ -116,8 +154,13 @@ app.get('/track', (req, res) =>{
                         trackNum,
                         title
                     }));
-                                
-                res.send(tracks)
+                    
+                    tracks.forEach((item) => {         
+                        saveData(new Track(item));
+                    })
+
+                    console.log("done")
+                    res.send("done")
             });
 });
 
