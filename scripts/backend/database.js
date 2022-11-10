@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { collection } = require('../../database/schema/genre');
+const { collection, find } = require('../../database/schema/genre');
 require("dotenv").config();
 
 const uri = `mongodb+srv://mtuenmuk:${process.env.password}@se3316.cfpaiqb.mongodb.net/se3316?retryWrites=true&w=majority`;
@@ -22,14 +22,32 @@ function findAll(collection, param, value){
     })
 }
 
+function findOne(collection, param, value, updateKey, updateValue){
+    let item = collection.findOne({
+        [param]: value
+    })
+    
+    item.updateKey = updateValue;
+
+    const doc = new collection(item)
+
+    doc.save();
+
+    return item
+}
+
 function deleteAll(collection){
     collection.deleteMany({})
 }
 
-function checkExist(collection, check){
-    collection.exist({
+function deleteOne(collection, param, value){
+    collection.deleteOne({[param]: value});
+}
 
+function checkExist(collection, param, check){
+    return collection.exists({
+        [param]: check
     })
 }
 
-module.exports = {saveData, delData, findAll, deleteAll};
+module.exports = {saveData, delData, findAll, deleteAll, checkExist, findOne, deleteOne};

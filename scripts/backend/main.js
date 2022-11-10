@@ -1,12 +1,14 @@
 const express = require("express");
 const {parse} = require('csv-parse');
 const fs = require('fs');
+const Joi = require('joi');
 
 
-const {saveData, findAll} = require('./database.js');
+const {saveData, findAll, checkExist, findOne, deleteOne} = require('./database.js');
 const Genre = require('../../database/schema/genre.js');
 const Artist = require("../../database/schema/artist.js");
 const Track = require("../../database/schema/track.js");
+const Playlist = require("../../database/schema/playlist.js");
 
 
 require("dotenv").config();
@@ -176,9 +178,85 @@ app.get('/track/:id', async (req, res) => {
     res.send(data)
 });
 
-app.post('/playlist', (req, res) => {
+app.post('/playlist', async (req, res) => {
+
+    const schema = Joi.object({
+        name: Joi.string().required()
+    });
+
+    const validation = schema.validate(req.body);
+        
+    if (validation.error){
+        res.status(400).send(validation.error.details[0].messages)
+        return;
+    }
+
+    const checker = await checkExist(Playlist, "name", req.body.name);
+    if (checker !== null){
+        console.log("Playlist already exist")
+        res.send("Playlist already exist")
+        return;
+    };
+
     
+    const playlist = {
+        name: req.body.name,
+        trackID: []
+    };
+
+    const pL = new Playlist(playlist);
+
+    saveData(pL);
+    res.send(playlist);
 });
+
+app.post('/playlist/tracks', async (req, res) =>{
+    const schema = Joi.object({
+        name: Joi.string().required(),
+        trackID: Joi.array().required()
+    });
+
+    const validation = schema.validate(req.body);
+        
+    if (validation.error){
+        res.status(400).send(validation.error.details[0].messages)
+        return;
+    }
+
+    const checker = await checkExist(Playlist, "name", req.body.name);
+    if (checker == null){
+        console.log("Playlist doesn't exist")
+        res.send("Playlist doesn't exist")
+        return;
+    };
+
+    const data = await findOne(Playlist, "name", req.body.name, "trackID", req.body.tracks)
+    res.send(data)
+    console.log("done")
+})
+
+app.post('/playlist/delete', async (req, res) =>{
+    const schema = Joi.object({
+        name: Joi.string().required(),
+    });
+
+    const validation = schema.validate(req.body);
+        
+    if (validation.error){
+        res.status(400).send(validation.error.details[0].messages)
+        return;
+    }
+
+    const checker = await checkExist(Playlist, "name", req.body.name);
+    if (checker == null){
+        console.log("Playlist doesn't exist")
+        res.send("Playlist doesn't exist")
+        return;
+    };
+
+    deleteOne(Playlist, "name", req.body.name)
+    console.log("deleted")
+})
 
 const port = process.env.PORT || 5501;
 app.listen(port, () => console.log(`listing to port ${port}`));
