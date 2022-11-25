@@ -2,13 +2,15 @@ const express = require("express");
 const {parse} = require('csv-parse');
 const fs = require('fs');
 const Joi = require('joi');
+const path = require('path');
 
 
-const {saveData, findAll, checkExist, findOne, deleteOne} = require('./database.js');
-const Genre = require('../../database/schema/genre.js');
-const Artist = require("../../database/schema/artist.js");
-const Track = require("../../database/schema/track.js");
-const Playlist = require("../../database/schema/playlist.js");
+const {saveData, findAll, checkExist, findOne, deleteOne, findOneStr} = require('./database.js');
+const Genre = require('../database/schema/genre.js');
+const Artist = require("../database/schema/artist.js");
+const Track = require("../database/schema/track.js");
+const Playlist = require("../database/schema/playlist.js");
+const { type } = require("os");
 
 
 require("dotenv").config();
@@ -17,13 +19,10 @@ const app = express();
 
 app.use(express.json());
 
-app.get('/', (req, res) =>{
-    console.log('here');
-    res.send('Hi');
-});
+app.use(express.static('public'))
+app.use('/', express.static('public/pages'))
 
-
-app.get('/genres', (req, res) =>{
+app.get('/getGenres', (req, res) =>{
     
     const genre = [];
 
@@ -51,8 +50,6 @@ app.get('/genres', (req, res) =>{
                         parentID,
                         title
                     }));
-                
-                 
 
                 genres.forEach((item) => {         
                     saveData(new Genre(item));
@@ -64,7 +61,7 @@ app.get('/genres', (req, res) =>{
 });
 
 
-app.get('/artist', (req, res) =>{
+app.get('/getArtist', (req, res) =>{
     
     const artist = [];
 
@@ -110,7 +107,7 @@ app.get('/artist', (req, res) =>{
 });
 
 
-app.get('/track', (req, res) =>{
+app.get('/getTrack', (req, res) =>{
     
     const track = [];
 
@@ -124,6 +121,13 @@ app.get('/track', (req, res) =>{
                 })
             )
             .on('data', (data)=>{
+
+                duration = data.track_duration.split(':');
+
+                minute = parseFloat(duration[0]) + (parseFloat(duration[1]) / 60);
+
+                data.track_duration = minute.toString();
+
                 track.push(data);
             })
             .on("end", () => {
@@ -172,9 +176,45 @@ app.get('/artist/:name', async (req, res) => {
     res.send(data)
 });
 
-app.get('/track/:id', async (req, res) => {
-    const data = await findAll(Track, "trackID", req.params.id)
-    console.log("done")
+app.get('/track/:title', async (req, res) => {
+    const data = await findOneStr(Track, "title", req.params.title)
+    
+    let newDuration = data.duration.split('.');
+
+    let minute = newDuration[0];
+
+    let sec = Math.floor((parseFloat('0.' + newDuration[1])*60)).toString();
+
+    data['duration'] = `${minute}:${sec}`;
+
+    res.send(data)
+});
+
+app.get('/track-album/:album', async (req, res) => {
+    const data = await findOneStr(Track, "albumTitle", req.params.album)
+
+    let newDuration = data.duration.split('.');
+
+    let minute = newDuration[0];
+
+    let sec = Math.floor((parseFloat('0.' + newDuration[1])*60)).toString();
+
+    data['duration'] = `${minute}:${sec}`;
+
+    res.send(data)
+});
+
+app.get('/track-artist/:name', async (req, res) => {
+    const data = await findOneStr(Track, "name", req.params.name)
+
+    let newDuration = data.duration.split('.');
+
+    let minute = newDuration[0];
+
+    let sec = Math.floor((parseFloat('0.' + newDuration[1])*60)).toString();
+
+    data['duration'] = `${minute}:${sec}`;
+
     res.send(data)
 });
 
@@ -261,14 +301,46 @@ app.post('/playlist/delete', async (req, res) =>{
 app.get('/playlist/count', async (req, res) => {
     const count = [];
     
+    const durationList = [];
+    
     const data = await findAll(Playlist)
-    data.forEach( (item) => {
-        item.trackNum = item.tracks.length
+
+    for (item of data) {
+
+        let trackNum = item.tracks.length;
         
-        count.push(item)
-    })
-    res.send(data)
+        let nameList = {
+            'name': item.name,
+            'trackNum': trackNum,
+            'totalDuration': await calcTotalDuration(item.tracks)
+        };
+        
+        count.push(nameList)
+    }
+    res.send(count)
 });
+
+async function calcTotalDuration(tracks){
+    
+    let totalDuration = 0;
+
+    for (track of tracks){
+        let data = await findOne(Track, 'trackID', track)
+
+        let minute = parseFloat(data.duration);
+        
+        totalDuration += minute;
+        
+    }
+    
+    let newDuration = totalDuration.toString().split('.');
+
+    let minute = newDuration[0];
+
+    let sec = Math.floor((parseFloat('0.' + newDuration[1])*60)).toString();
+    
+    return `${minute}:${sec}`;
+}
 
 const port = process.env.PORT || 5501;
 app.listen(port, () => console.log(`listing to port ${port}`));

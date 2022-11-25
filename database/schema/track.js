@@ -4,11 +4,11 @@ const Schema = mongoose.Schema;
 const trackSchema = new Schema({
     trackID: {
         type: Number,
-        required: true
+        required: false
     },
     albumID: {
         type: Number,
-        requried: true
+        requried: false
     },
     albumTitle: {
         type: String,
@@ -16,7 +16,7 @@ const trackSchema = new Schema({
     },
     artistID: {
         type: Number,
-        required: true
+        required: false
     },
     name: {
         type: String,
@@ -28,7 +28,7 @@ const trackSchema = new Schema({
     },
     creationDate: {
         type: String,
-        required: true
+        required: false
     },
     recordDate: {
         type: String,
@@ -44,11 +44,11 @@ const trackSchema = new Schema({
     },
     trackNum: {
         type: Number,
-        required: true
+        required: false
     },
     title: {
         type: String,
-        required: true
+        required: false
     }
 });
 

@@ -1,8 +1,7 @@
 const mongoose = require('mongoose');
-const { collection, find } = require('../../database/schema/genre');
 require("dotenv").config();
 
-const uri = `mongodb+srv://mtuenmuk:${process.env.password}@se3316.cfpaiqb.mongodb.net/se3316?retryWrites=true&w=majority`;
+const uri = `mongodb+srv://mtuenmuk:${process.env.mongodbPsw}@se3316.cfpaiqb.mongodb.net/se3316?retryWrites=true&w=majority`;
 mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true})
     .then((result) => console.log('connected to db'))
     .catch((err) => console.log(err))
@@ -21,23 +20,31 @@ function getAll(collection){
 }
 
 function findAll(collection, param, value){
+    
+    if ((typeof value) == String){
+        return collection.find({
+            [param]: { $regex: new RegExp(value, 'i')}
+        })
+    }
+
     return collection.find({
         [param]: value
     })
+
+    
 }
 
-function findOne(collection, param, value, updateKey, updateValue){
-    let item = collection.findOne({
+async function findOneStr(collection, param, value, updateKey, updateValue){
+        
+    return await collection.findOne({
+        [param]: { $regex: new RegExp(value, 'i')}
+    })
+}
+
+async function findOne(collection, param, value, updateKey, updateValue){
+    return await collection.findOne({
         [param]: value
     })
-    
-    item.updateKey = updateValue;
-
-    const doc = new collection(item)
-
-    doc.save();
-
-    return item
 }
 
 function deleteAll(collection){
@@ -54,4 +61,4 @@ function checkExist(collection, param, check){
     })
 }
 
-module.exports = {saveData, delData, findAll, deleteAll, checkExist, findOne, deleteOne};
+module.exports = {saveData, delData, findAll, deleteAll, checkExist, findOne, deleteOne, findOneStr};

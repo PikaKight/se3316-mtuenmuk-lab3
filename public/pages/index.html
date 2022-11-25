@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <meta charset="utf-8">
         <title>
             Marcus Tuen Muk Lab 3
         </title>
@@ -17,30 +18,32 @@
 
             <label>Search by Album:</label>
             <input id="album" type="search">
+
+            <button id="reset">Reset</button>
         </div>
         <div class="results">
             <h3>Results: </h3>
-            
-            <table class="resultList">
-                <tr>
-                    <th>Track Name</th>
-                    <th>Artist Name</th>
-                    <th>Album Name</th>
-                </tr>
-            </table>
+            <button id="sortTrack">Sort by Track Title</button>
+            <button id="sortAlbum">Sort by Album Title</button>
+        
         </div>
+
         <div class="myList">
             <h3>Favorite: </h3>
+            <button id="sortTrack2">Sort by Track Title</button>
+            <button id="sortAlbum2">Sort by Album Title</button>
+            <button id="sortDuration">Sort by Duration</button>
             <table class="fav">
                 <tr>
-                    <th>Ranking</th>
+                    <th>Remove</th>
                     <th>Track Name</th>
                     <th>Artist Name</th>
                     <th>Album Name</th>
+                    <th>Duration</th>
                 </tr>
             </table>
         </div>
 
-        <script src="../scripts/frontend/table.js"></script>
+        <script src="../frontend/table.js" ></script>
     </body>
 </html>
